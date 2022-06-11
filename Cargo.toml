@@ -1,6 +1,8 @@
 [workspace]
-
 members = [
     "simple",
     "minigrep",
 ]
+
+[profile.release]
+lto = true
