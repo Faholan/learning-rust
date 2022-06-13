@@ -2,6 +2,7 @@
 members = [
     "simple",
     "minigrep",
+    "crible",
 ]
 
 [profile.release]
