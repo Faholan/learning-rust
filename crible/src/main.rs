@@ -28,10 +28,44 @@ fn crible(n: &usize) -> Vec<usize> {
     result
 }
 
-fn main() -> Result<(), String> {
-    let mut args = env::args();
-    args.next();
+fn run_timeit(mut args: env::Args) -> Result<(), String> {
+    let n = match args.next() {
+        Some(arg) => match arg.trim().parse() {
+            Ok(x) => x,
+            Err(_) => return Err(String::from("Failed to parse number!")),
+        },
+        None => return Err(String::from("Missing required boundary Argument")),
+    };
 
+    let mut output = match args.next() {
+        Some(arg) => match File::create(arg) {
+            Ok(file) => file,
+            Err(e) => return Err(format!("Failed to open file: {}", e)),
+        },
+        None => return Err(String::from("Missing required filename argument")),
+    };
+
+    let mut result = Vec::with_capacity(n);
+
+    for i in 2..=n {
+        let now = Instant::now();
+        crible(&i);
+        let elapsed_time = now.elapsed();
+
+        result.push(elapsed_time.as_micros());
+    }
+
+    let res = String::from_iter(result.iter().map(|i| format!("{}\n", i)));
+
+    match write!(output, "{}", res) {
+        Ok(_) => (),
+        Err(e) => return Err(format!("Failed to write to file: {}", e)),
+    };
+
+    Ok(())
+}
+
+fn run(mut args: env::Args) -> Result<(), String> {
     let n = match args.next() {
         Some(arg) => match arg.trim().parse() {
             Ok(x) => x,
@@ -67,4 +101,14 @@ fn main() -> Result<(), String> {
     };
 
     Ok(())
+}
+
+fn main() -> Result<(), String> {
+    let mut args = env::args();
+    args.next();
+    if env::var("TIMEIT").is_ok() {
+        run_timeit(args)
+    } else {
+        run(args)
+    }
 }

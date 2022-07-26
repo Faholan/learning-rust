@@ -3,6 +3,8 @@ members = [
     "simple",
     "minigrep",
     "crible",
+    "algo_tipe",
+    "fibo",
 ]
 
 [profile.release]
